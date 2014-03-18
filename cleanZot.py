@@ -259,3 +259,41 @@ def fnd_rep(names, thresh):
             if len(parts) != len(rmr_parts) and len(rmr_parts) >= thresh:
                 rtn.append((idx, name, parts, rmr_parts))
     return rtn
+
+
+try:
+    zot = zotero.Zotero('', 'user', '')
+except:
+    print('Could not connect')
+
+
+class Person(object):
+    """
+    Author Info
+    """
+    def __init__(self, name_first, name_last):
+        self._name = [name_last, name_first]
+        self._ascii_name = [re.sub(r'`', '\'', unidecode(n))
+                            for n in self._name]
+
+    def name(self, idx, uni):
+        if uni:
+            return self._name[idx]
+        else:
+            return self._ascii_name[idx]
+
+    def name_last(self, *args, **kwargs):
+        uni = kwargs.get('uni', False)
+        return self.name(0, uni)
+
+    def name_first(self, *args, **kwargs):
+        uni = kwargs.get('uni', True)
+        return self.name(1, uni)
+
+    def update(self):
+        pass
+
+ppl = []
+for x in itms[239]['creators']:
+    if 'firstName' in x and 'lastName' in x:
+        ppl.append(Person(x['firstName'], x['lastName']))
