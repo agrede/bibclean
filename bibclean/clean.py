@@ -2,6 +2,7 @@ import re
 import references
 import json
 import urllib.request
+from dateutil import parser
 
 
 def frequent_person(people):
@@ -47,3 +48,17 @@ def remove_ezproxy(items, proxy):
                 item.url = ''.join([m
                                     for m in rePRB.search(item.url).groups()
                                     if m is not None])
+
+
+def fix_dates(items):
+    reODT = re.compile(r'^\d{4}(?:-\d{2}){0,2}$')
+    reFDY = re.compile(r'\b(\d{1,2})\b')
+    needs_fix = []
+    for item in items:
+        if not reODT.search(item.date) and item.date != '':
+            date_obj = parser.parse(item.date)
+            date_days = [int(d) for d in reFDY.findall(item.date)]
+            if date_obj.day != date_obj.month and date_obj.day in date_days:
+                item.date = date_obj.strftime('%Y-%m-%d')
+            else:
+                needs_fix.append((item, date_obj, date_days))
