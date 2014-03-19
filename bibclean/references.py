@@ -4,6 +4,10 @@ import re
 import weakref
 
 
+def name_to_ascii(name):
+    return [re.sub(r'`', '\'', unidecode(n)) for n in name]
+
+
 class References(object):
     """
     Parent of reference sources
@@ -126,39 +130,59 @@ class People(object):
 
 class Person(object):
     """
+    Person
+    """
+    def __init__(self, name):
+        self._contributions = []
+        self._name = name
+
+    def ascii_name(self):
+        return name_to_ascii(self._name)
+
+    def contributions(self):
+        return self._contributions
+
+    def add_contribution(self, item, name):
+        tmp = Contributer(item, self, name)
+        if self._name != name:
+            try:
+                tmp.name = self._name
+            except:
+                raise
+                return False
+        self._contributions.append(tmp)
+        return True
+
+    @property
+    def name(self):
+        return self._name
+
+    def __str__(self):
+        return print(', '.join(self._name))
+
+
+
+class Contributer(object):
+    """
     Author Info
     """
-    def __init__(self, parent, name_first, name_last):
-        self.parent = weakref.ref(parent)
-        self._name = [name_last, name_first]
-        self._set_ascii_name()
+    def __init__(self, item, person, name):
+        self.item = weakref.ref(item)
+        self.person = weakref.ref(person)
+        self._name = name
 
-    def _set_ascii_name(self):
-        self._ascii_name = [re.sub(r'`', '\'', unidecode(n))
-                            for n in self._name]
+    def ascii_name(self):
+        return name_to_ascii(self._name)
 
-    def name(self, idx, uni):
-        if uni:
-            return self._name[idx]
-        else:
-            return self._ascii_name[idx]
+    @property
+    def name(self):
+        return self._name
 
-    def name_last(self, *args, **kwargs):
-        uni = kwargs.get('uni', False)
-        return self.name(0, uni)
-
-    def name_first(self, *args, **kwargs):
-        uni = kwargs.get('uni', True)
-        return self.name(1, uni)
-
-    def update(self, name):
-        idx = self.parent.people.index(self)
+    @name.setter
+    def name(self, value):
+        idx = self.parent.index(self)
         try:
-            if self.parent.update_person(idx, name):
-                self._name = name
-                self._set_ascii_name()
-                return True
+            if self.parent.update_person(idx, value):
+                self._name = value
         except:
             raise
-            return False
-        return False
