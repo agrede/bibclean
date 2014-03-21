@@ -1,4 +1,4 @@
-import re
+import regex
 import references
 import json
 import urllib.request
@@ -35,14 +35,14 @@ def remove_ezproxies(items, *args, **kwargs):
 
 
 def remove_ezproxy(items, proxy):
-    prox_brk = re.search(r'^(?:https?://)([^/\?]+)(.*)\$\@$', proxy)
+    prox_brk = regex.search(r'^(?:https?://)([^/\?]+)(.*)\$\@$', proxy)
     if prox_brk:
-        rePRB = re.compile(r'^(https?://)?(?:(.+)\.|)' +
+        rePRB = regex.compile(r'^(https?://)?(?:(.+)\.|)' +
                            re.escape(prox_brk.group(1)) +
                            r'(?:' +
                            re.escape(prox_brk.group(2)) +
                            r'https?://)?(.*)$')
-        rePRD = re.compile(re.escape(prox_brk.group(1)))
+        rePRD = regex.compile(re.escape(prox_brk.group(1)))
         for item in items:
             if rePRD.search(item.url):
                 item.url = ''.join([m
@@ -51,8 +51,8 @@ def remove_ezproxy(items, proxy):
 
 
 def fix_dates(items):
-    reODT = re.compile(r'^\d{4}(?:-\d{2}){0,2}$')
-    reFDY = re.compile(r'\b(\d{1,2})\b')
+    reODT = regex.compile(r'^\d{4}(?:-\d{2}){0,2}$')
+    reFDY = regex.compile(r'\b(\d{1,2})\b')
     needs_fix = []
     for item in items:
         if not reODT.search(item.date) and item.date != '':
