@@ -298,7 +298,7 @@ class Contributor(object):
 
     @name.setter
     def name(self, value):
-        idx = self.item.index(self)
+        idx = self.item.contributors.index(self)
         if self._name != value:
             self.item.update_contributor(idx, value)
             self._name = value
@@ -310,6 +310,7 @@ class Contributor(object):
         self.person.contributions.remove(self)
         if person.name != self.name:
             self.name = person.name
+        person.contributions.append(self)
         self.person = weakref.proxy(person)
 
     def __str__(self):
