@@ -120,7 +120,8 @@ class References(object):
     """
     Parent of reference sources
     """
-    def __init__(self, dbc, dbc_params):
+    def __init__(self, dbc, dbc_params, *cargs, **kwargs):
+        self.test = kwargs.get('test', False)
         self.dbc = zotero.Zotero(dbc_params['library_id'],
                                  'user', dbc_params['api_key'])
         self.dbc_params = dbc_params
@@ -128,9 +129,9 @@ class References(object):
         self.people = {}
 
     def get_all(self):
-        items_raw = self._dbc.everything(self._dbc.top())
+        items_raw = self.dbc.everything(self.dbc.top())
         for item_raw in items_raw:
-            self.add_item(self, item_raw)
+            self.add_item(item_raw)
 
     def add_item(self, raw):
         self.items.append(Item(self, raw))
@@ -138,10 +139,9 @@ class References(object):
     def get_person(self, name):
         if not name[0] in self.people:
             self.people[name[0]] = {}
-        if name[1] in self.people[name[0]]:
-            return self.people[name[0]][name[1]]
-        else:
+        if name[1] not in self.people[name[0]]:
             self.people[name[0]][name[1]] = Person(name)
+        return self.people[name[0]][name[1]]
 
 
 class Item(object):
@@ -150,10 +150,13 @@ class Item(object):
     """
     def __init__(self, parent, raw):
         self._raw = raw
-        self.parent = weakref.ref(parent)
+        self.parent = weakref.proxy(parent)
         self.contributors = []
+        self._add_contributor()
 
     def update(self):
+        if self.parent.test:
+            return True
         if self.parent.dbc.check_items([self._raw]):
             try:
                 self._raw = self.parent.update_item(self._raw)
@@ -181,7 +184,7 @@ class Item(object):
         if 'creators' in self._raw:
             for creator in self._raw['creators']:
                 if 'firstName' in creator and 'lastName' in creator:
-                    name = [creator['lastName'], creator['firstName']]
+                    name = (creator['lastName'], creator['firstName'])
                     person = self.parent.get_person(name)
                     self.contributors.append(
                         person.add_contribution(self, name))
@@ -238,7 +241,7 @@ class Person(object):
         return name_to_ascii(self._name)
 
     def add_contribution(self, item, name):
-        contrib = Contributer(item, self, name)
+        contrib = Contributor(item, self, name)
         if self._name != name:
             contrib.name = self._name
         self.contributions.append(contrib)
@@ -262,26 +265,27 @@ class Person(object):
         cocontrib = []
         counts = []
         for contrib in self.contributions:
-            for cocon in contrib.cocontributors:
-                if cocon.person in cocontrib:
+            for cocon in contrib.cocontributors():
+                if cocon.person not in cocontrib:
                     cocontrib.append(cocon.person)
                     counts.append(1)
                 else:
                     idx = cocontrib.index(cocon.person)
                     counts[idx] += 1
-        return cocontrib
+        return zip(cocontrib, counts)
 
     def __str__(self):
-        return print(', '.join(self._name))
+        return ''.join(['Person: ', ', '.join(self.name), '; Items: ',
+                        str(len(self.contributions))])
 
 
-class Contributer(object):
+class Contributor(object):
     """
     Author Info
     """
     def __init__(self, item, person, name):
-        self.item = weakref.ref(item)
-        self.person = weakref.ref(person)
+        self.item = weakref.proxy(item)
+        self.person = weakref.proxy(person)
         self._name = name
 
     @property
@@ -299,11 +303,14 @@ class Contributer(object):
             self.item.update_contributor(idx, value)
             self._name = value
 
-    def cocontributers(self):
+    def cocontributors(self):
         return [con for con in self.item.contributors if con is not self]
 
     def change_person(self, person):
         self.person.contributions.remove(self)
         if person.name != self.name:
             self.name = person.name
-        self.person = weakref.ref(person)
+        self.person = weakref.proxy(person)
+
+    def __str__(self):
+        return ''.join(['Contrib: ', ', '.join(self.name)])
