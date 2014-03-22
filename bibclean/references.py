@@ -272,6 +272,9 @@ class Person(object):
         return ''.join(['Person: ', ', '.join(self.name), '; Items: ',
                         str(len(self.contributions))])
 
+    def __lt__(self, other):
+        return ' '.join(self.ascii_name) < ' '.join(other.ascii_name)
+
 
 class Contributor(object):
     """
