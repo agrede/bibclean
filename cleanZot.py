@@ -297,3 +297,23 @@ ppl = []
 for x in itms[239]['creators']:
     if 'firstName' in x and 'lastName' in x:
         ppl.append(Person(x['firstName'], x['lastName']))
+
+for idi, itm in enumerate(ref.items):
+    if itm is None:
+        print('Item:', str(idi))
+    else:
+        for idc, con in enumerate(itm.contributors):
+            if con is None:
+                print('Item', str(idi), 'Con:', str(idc))
+
+for ln, fns in ref.people.items():
+    if fns is None:
+        print('No FNS:', ln)
+    else:
+        for fn, per in fns.items():
+            if per is None:
+                print('No Person:', ln, fn)
+            else:
+                for idx, con in enumerate(per.contributions):
+                    if con is None:
+                        print('No Contrib:', ln, fn, '; id:', idx)
