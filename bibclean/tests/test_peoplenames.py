@@ -46,5 +46,15 @@ class TestListFunctions(unittest.TestCase):
     def test_inv_idx(self):
         self.assertEqual([0, 2, 3], peoplenames.inv_idx([1, 4], 5))
 
+
+class TestNameComparisons(unittest.TestCase):
+    def test_name_comp(self):
+        namesets = [
+            (2+1+1/4, ('Smith', 'Jane Kate'), ('Smith', 'Jane K.')),
+            (1.75+1.75/2+1/4, ('Ó Súilleabháin', 'Jörg Tanjō'),
+             ("O'Suilleabhain", 'Jorg T.'))]
+        for ns in namesets:
+            self.assertEqual(ns[0], peoplenames.name_comp(ns[1], ns[2]))
+
 if __name__ == '__main__':
     unittest.main()
