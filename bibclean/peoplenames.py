@@ -2,17 +2,21 @@ from unidecode import unidecode
 import regex
 
 
-reBRK = regex.compile(r"\b((\p{Ll})\p{Ll}*)\b|((\p{Lu})('\p{Lu})?\p{Ll}*)")
+reBRK = regex.compile(r"\b((\p{Ll})\p{Ll}*)\b|" +
+                      r"\b((Ó)\s?\p{Lu}\p{Ll}*)|" +
+                      r"((\p{Lu})('\p{Lu})?\p{Ll}*)")
 
 
 def break_name(name):
     parts = [[], []]
     for idx, nm in enumerate(name):
         for p in reBRK.findall(nm):
-            if p[0] == '':
+            if p[0] != '':
+                parts[idx].append(p[:2])
+            elif p[2] != '':
                 parts[idx].append((p[2], p[3]))
             else:
-                parts[idx].append(p[:2])
+                parts[idx].append((p[4], p[5]))
     return parts
 
 
