@@ -11,12 +11,17 @@ class TestUnicodeFunctions(unittest.TestCase):
 
 
 class TestListFunctions(unittest.TestCase):
-    def test_break_name_unicode(self):
-        name = ('(George) Ó Súilleabháin', 'Jörg-T.')
-        rnme = peoplenames.break_name(name)
-        tnme = [[('George', 'G'), ('Ó Súilleabháin', 'Ó')],
-                [('Jörg', 'J'), ('T', 'T')]]
-        self.assertEqual(rnme, tnme)
+    def test_break_name(self):
+        names = [('(George) Ó Súilleabháin', 'Jörg-T.'),
+                 ('Smith', 'Jane Kate'),
+                 ("O'Brian", 'James T.')]
+
+        tnmes = [[[('George', 'G'), ('Ó Súilleabháin', 'Ó')],
+                  [('Jörg', 'J'), ('T', 'T')]],
+                 [[('Smith', 'S')], [('Jane', 'J'), ('Kate', 'K')]],
+                 [[("O'Brian", 'O')], [('James', 'J'), ('T', 'T')]]]
+        for idx, name in enumerate(names):
+            self.assertEqual(peoplenames.break_name(name), tnmes[idx])
 
     def test_break_name_simple(self):
         name = ('Smith', 'Jane Kate')
@@ -37,6 +42,9 @@ class TestListFunctions(unittest.TestCase):
         tprts = [['Jane', 'Kate'], ['J', 'K']]
         for idx, tprt in enumerate(tprts):
             self.assertEqual(tprt, peoplenames.part_comp(parts, idx))
+
+    def test_inv_idx(self):
+        self.assertEqual([0, 2, 3], peoplenames.inv_idx([1, 4], 5))
 
 if __name__ == '__main__':
     unittest.main()
