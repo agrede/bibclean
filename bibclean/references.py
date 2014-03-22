@@ -186,8 +186,9 @@ class Item(object):
                 if 'firstName' in creator and 'lastName' in creator:
                     name = (creator['lastName'], creator['firstName'])
                     person = self.parent.get_person(name)
-                    self.contributors.append(
-                        person.add_contribution(self, name))
+                    contrib = Contributor(self, person, name)
+                    self.contributors.append(contrib)
+                    person.contributions.add(contrib)
 
     @property
     def url(self):
@@ -233,19 +234,12 @@ class Person(object):
     Person
     """
     def __init__(self, name):
-        self.contributions = []
+        self.contributions = weakref.WeakSet()
         self._name = name
 
     @property
     def ascii_name(self):
         return name_to_ascii(self._name)
-
-    def add_contribution(self, item, name):
-        contrib = Contributor(item, self, name)
-        if self._name != name:
-            contrib.name = self._name
-        self.contributions.append(contrib)
-        return contrib
 
     @property
     def name(self):
@@ -285,7 +279,7 @@ class Contributor(object):
     """
     def __init__(self, item, person, name):
         self.item = weakref.proxy(item)
-        self.person = weakref.proxy(person)
+        self._person = weakref.proxy(person)
         self._name = name
 
     @property
@@ -303,15 +297,19 @@ class Contributor(object):
             self.item.update_contributor(idx, value)
             self._name = value
 
+    @property
+    def person(self):
+        return self._person
+
+    @person.setter
+    def person(self, value):
+        value.contributors.add(self)
+        self._person.contributors.remove(self)
+        self._person = weakref.proxy(value)
+        self.name = value.name
+
     def cocontributors(self):
         return [con for con in self.item.contributors if con is not self]
-
-    def change_person(self, person):
-        self.person.contributions.remove(self)
-        if person.name != self.name:
-            self.name = person.name
-        person.contributions.append(self)
-        self.person = weakref.proxy(person)
 
     def __str__(self):
         return ''.join(['Contrib: ', ', '.join(self.name)])
