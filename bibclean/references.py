@@ -303,8 +303,8 @@ class Contributor(object):
 
     @person.setter
     def person(self, value):
-        value.contributors.add(self)
-        self._person.contributors.remove(self)
+        value.contributions.add(self)
+        self._person.contributions.remove(self)
         self._person = weakref.proxy(value)
         self.name = value.name
 
