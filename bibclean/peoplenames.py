@@ -156,8 +156,10 @@ def name_part_in_parts(part, parts):
         return name_to_ascii(part_comp(parts, 0)).index(name_to_ascii(part[0]))
     elif part[1] in part_comp(parts, 1):
         return part_comp(parts, 1).index(part[1])
-    elif name_to_ascii(part[1]) in name_to_ascii(part_comp(parts, 1)):
-        return name_to_ascii(part_comp(parts, 1)).index(name_to_ascii(part[1]))
+    elif name_to_ascii(part[1])[0] in part_comp(
+            name_to_ascii(part_comp(parts, 1)), 0):
+        return name_to_ascii(
+            part_comp(parts, 1)).index(name_to_ascii(part[1])[0])
     else:
         return None
 
