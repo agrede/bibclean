@@ -2,7 +2,45 @@ import unittest
 import peoplenames
 
 
+class TestRecursiveFunctions(unittest.TestCase):
+    def test_rec_apply(self):
+        testsets = [
+            (
+                {'A': 7, 'B': 13},
+                lambda x: x+2,
+                {'A': 5, 'B': 11}
+            ),
+            (
+                (7, 13),
+                lambda x: x+2,
+                (5, 11)
+            ),
+            (
+                [7, 13],
+                lambda x: x+2,
+                [5, 11]
+            ),
+            (
+                {0},
+                lambda x: x*0,
+                {3, 5}
+            ),
+            (
+                {'A': [7, 13], 'B': [(7, 13), (19, 31)]},
+                lambda x: x+2,
+                {'A': [5, 11], 'B': [(5, 11), (17, 29)]}
+            )
+        ]
+        for ts in testsets:
+            self.assertEqual(ts[0], peoplenames.rec_apply(ts[1], ts[2]),
+                             msg=str(ts[0]))
+
+
 class TestUnicodeFunctions(unittest.TestCase):
+    def test_single_name_to_ascii(self):
+        self.assertEqual("O'Suilleabhain",
+                         peoplenames.single_name_to_ascii('Ó Súilleabháin'))
+
     def test_name_to_ascii(self):
         name = ('Ó Súilleabháin', 'Jörg Tanjō')
         rnme = peoplenames.name_to_ascii(name)
@@ -49,7 +87,7 @@ class TestListFunctions(unittest.TestCase):
         self.assertEqual([0, 2, 3], peoplenames.inv_idx([1, 4], 5))
 
 
-class TestNameComparisons(unittest.TestCase):
+class TestNameComparisonFunctions(unittest.TestCase):
     def test_name_comp(self):
         namesets = [
             (2+1+1/4, ('Smith', 'Jane Kate'), ('Smith', 'Jane K.')),
@@ -87,7 +125,7 @@ class TestNameComparisons(unittest.TestCase):
                              msg=str(ns[0]))
 
 
-class TestNameRedundancies(unittest.TestCase):
+class TestNameRedundancyFunctions(unittest.TestCase):
     def test_name_repeat_block_length(self):
         testsets = [
             (2, [('Jane', 'J'), ('Kate', 'K'), ('J', 'J'), ('K', 'K')]),

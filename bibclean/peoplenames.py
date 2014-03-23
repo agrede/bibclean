@@ -149,6 +149,19 @@ def remove_redundancies(parts):
     return final_parts
 
 
+def name_part_in_parts(part, parts):
+    if part[0] in part_comp(parts, 0):
+        return part_comp(parts, 0).index(part[0])
+    elif name_to_ascii(part[0]) in name_to_ascii(part_comp(parts, 0)):
+        return name_to_ascii(part_comp(parts, 0)).index(name_to_ascii(part[0]))
+    elif part[1] in part_comp(parts, 1):
+        return part_comp(parts, 1).index(part[1])
+    elif name_to_ascii(part[1]) in name_to_ascii(part_comp(parts, 1)):
+        return name_to_ascii(part_comp(parts, 1)).index(name_to_ascii(part[1]))
+    else:
+        return None
+
+
 def fullest_name(a, b):
     """Temp returns longest of a or b"""
     name = list(a)
@@ -165,5 +178,27 @@ def name_to_ascii(name):
 
     e.g. ('Ó Súilleabháin', 'Jörg Tanjō') -> ("O'Suilleabhain", 'Jorg Tanjo')
     """
-    name = [regex.sub(r'\bÓ\s?(\p{Lu})', 'O\'\g<1>', n) for n in name]
-    return tuple([regex.sub(r'`', '\'', unidecode(n)) for n in name])
+    return rec_apply(single_name_to_ascii, name)
+
+
+def single_name_to_ascii(name):
+    name = regex.sub(r'\bÓ\s?(\p{Lu})', 'O\'\g<1>', name)
+    name = regex.sub(r'`', '\'', unidecode(name))
+    return name
+
+
+def rec_apply(function, item):
+    itype = type(item)
+    if itype is set:
+        return set([rec_apply(function, itm) for itm in item])
+    elif itype is tuple:
+        return tuple([rec_apply(function, itm) for itm in item])
+    elif itype is dict:
+        ndict = {}
+        for key, value in item.items():
+            ndict[key] = rec_apply(function, value)
+        return ndict
+    elif itype is list:
+        return [rec_apply(function, itm) for itm in item]
+    else:
+        return function(item)
