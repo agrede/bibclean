@@ -70,5 +70,27 @@ class TestNameComparisons(unittest.TestCase):
         for nrp in nonredparts:
             self.assertFalse(peoplenames.name_redundancy(nrp), msg=str(nrp))
 
+    def test_fullest_name(self):
+        namesets = [
+            (
+                ('Ó Súilleabháin', 'Jörg Tanjō'),
+                ('Ó Súilleabháin', 'Jörg Tanjō'),
+                ("O'Suilleabhain", 'Jorg Tanjo')
+            ),
+            (
+                ('Ó Súilleabháin', 'Jorg Tanjo'),
+                ('Ó Súilleabháin', 'J.T.'),
+                ("O'Suilleabhain", 'Jorg Tanjo')
+            ),
+            (
+                ('Doe', 'Josh B.'),
+                ('Doe', 'Josh'),
+                ('Doe', 'J.B.')
+            )
+        ]
+        for ns in namesets:
+            self.assertEqual(ns[0], peoplenames.fullest_name(ns[1], ns[2]),
+                             msg=str(ns[0]))
+
 if __name__ == '__main__':
     unittest.main()
