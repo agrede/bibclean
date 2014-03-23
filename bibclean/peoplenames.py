@@ -8,6 +8,7 @@ reBRK = regex.compile(r"\b((\p{Ll})\p{Ll}*)\b|" +
 
 
 def break_name(name):
+    """Breaks name tuple arrays with tuples of the form ('Name', 'N')."""
     parts = [[], []]
     for idx, nm in enumerate(name):
         for p in reBRK.findall(nm):
@@ -21,19 +22,25 @@ def break_name(name):
 
 
 def part_comp(parts, comp):
+    """Uses parts with nested arrays or tuples to return parts[:][comp]."""
     return [p[comp] for p in parts]
 
 
 def inv_idx(idxs, N):
-    """
-    numbers between in range(0, N) that are not in idxs
-    """
+    """ Returns list of numbers in range(0, N) that are not in list idxs."""
     return [idx for idx in range(0, N) if idx not in idxs]
 
 
 def name_comp(a, b):
     """
-    Calculate comparison score between two Unicode name tuples (last, first)
+    Calculate comparison score between two Unicode name tuples.
+
+    a and b have the form (last, first) and must have a full part of the last
+    name in common: e.g. ('Smith Doe', 'John') and ('Doe', 'John') will return
+    a non-zero result, but ('Smith D.', 'John') and ('Doe', 'John') will
+    return 0.
+
+    Unicode and ASCII equivalents are compared, Unicode matches score higher.
     """
     # Break names into parts --------------------------------------------------
     # Name a
@@ -112,7 +119,8 @@ def name_comp(a, b):
 
 def name_to_ascii(name):
     """
-    Changes names to pseudo-ASCII equivilent
+    Changes names to pseudo-ASCII equivilent.
+
     e.g. ('Ó Súilleabháin', 'Jörg Tanjō') -> ("O'Suilleabhain", 'Jorg Tanjo')
     """
     name = [regex.sub(r'\bÓ\s?(\p{Lu})', 'O\'\g<1>', n) for n in name]
