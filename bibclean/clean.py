@@ -5,14 +5,6 @@ import urllib.request
 from dateutil import parser
 
 
-def frequent_person(people):
-    pass
-
-
-def comp_people(people):
-    pass
-
-
 def remove_ezproxies(items, *args, **kwargs):
     proxy_list_url = kwargs.get('proxy_list_url',
                                 'http://ezproxy-db.appspot.com/proxies.json')
