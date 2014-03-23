@@ -83,6 +83,11 @@ class TestNameComparisons(unittest.TestCase):
                 ("O'Suilleabhain", 'Jorg Tanjo')
             ),
             (
+                ('Ó Súilleabháin', 'Jorg Tanjo'),
+                ('Ó Súilleabháin', 'Jörg Tanjō J.T.'),
+                ("O'Suilleabhain", 'Jorg Tanjo')
+            ),
+            (
                 ('Doe', 'Josh B.'),
                 ('Doe', 'Josh'),
                 ('Doe', 'J.B.')
