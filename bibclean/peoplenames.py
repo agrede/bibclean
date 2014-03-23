@@ -48,7 +48,7 @@ def name_comp(a, b):
     aa = name_to_ascii(a)        # ASCII name
     aap = break_name(aa)         # ASCII parts
     lnap = part_comp(aap[0], 0)  # Full ASCII last name parts
-    # Name b
+n    # Name b
     bp = break_name(b)
     ba = name_to_ascii(b)
     bap = break_name(ba)
@@ -115,6 +115,14 @@ def name_comp(a, b):
             tidx = bains.index(aains[idx])
             score += 1/(idx+tidx+2)
     return score
+
+
+def name_redundancy(name):
+    pass
+
+
+def fullest_name(a, b):
+    pass
 
 
 def name_to_ascii(name):

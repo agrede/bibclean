@@ -1,5 +1,5 @@
 from pyzotero import zotero
-from peoplenames import name_comp, name_to_ascii
+from peoplenames import name_comp, name_to_ascii, fullest_name
 import weakref
 
 
@@ -170,6 +170,22 @@ class Person(object):
                     idx = cocontrib.index(cocon.person)
                     counts[idx] += 1
         return zip(cocontrib, counts)
+
+    def condensed_cocontributors(self, min_score):
+        cocontribs = sorted(self.cocontributors, key=lambda c: c[0].ascii_name)
+        cond_cocontrib = []
+        cur_cocontrib = cocontribs.pop()
+        for cocon in cocontribs:
+            if name_comp(cur_cocontrib[0].name, cocon[0].name) >= min_score:
+                cur_cocontrib[1] += cocon[1]
+                if cocon[0].name is fullest_name(cur_cocontrib[0].name,
+                                                 cocon[0].name):
+                    cur_cocontrib[0] = cocon[0]
+            else:
+                cond_cocontrib.append(cur_cocontrib)
+                cur_cocontrib = cocon
+        cond_cocontrib.append(cur_cocontrib)
+        return cond_cocontrib
 
     def __str__(self):
         return ''.join(['Person: ', ', '.join(self.name), '; Items: ',
