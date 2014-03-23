@@ -134,8 +134,17 @@ def name_redundancy(parts):
     return False
 
 
-def fullest_name(a, b):
+def remove_redundancy(parts):
     pass
+
+
+def fullest_name(a, b):
+    """Temp returns longest of a or b"""
+    if len(a[0]) < len(b[0]):
+        a[0] = b[0]
+    if len(a[1]) < len(b[1]):
+        a[1] = b[1]
+    return a
 
 
 def name_to_ascii(name):
