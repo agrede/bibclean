@@ -124,6 +124,18 @@ class TestNameComparisonFunctions(unittest.TestCase):
             self.assertEqual(ns[0], peoplenames.fullest_name(ns[1], ns[2]),
                              msg=str(ns[0]))
 
+    def test_name_part_in_parts(self):
+        testsets = [
+            (1, ('Tanjō', 'T'), [('Jörg', 'J'), ('Tanjō', 'T')]),
+            (0, ('Jörg', 'J'), [('Jorg', 'J'), ('Tanjo', 'T')]),
+            (1, ('Ἑρμιόνη', 'Ἑ'), [('Φοίβη', 'Φ'), ('Ἑ', 'Ἑ')]),
+            (0, ('Φοίβη', 'Φ'), [('P', 'P'), ('Ἑ', 'Ἑ')])
+        ]
+        for ts in testsets:
+            self.assertEqual(ts[0],
+                             peoplenames.name_part_in_parts(ts[1], ts[2]),
+                             msg=str(ts[1]))
+
 
 class TestNameRedundancyFunctions(unittest.TestCase):
     def test_name_repeat_block_length(self):
