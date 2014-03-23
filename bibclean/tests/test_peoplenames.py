@@ -56,5 +56,16 @@ class TestNameComparisons(unittest.TestCase):
         for ns in namesets:
             self.assertEqual(ns[0], peoplenames.name_comp(ns[1], ns[2]))
 
+    def test_name_redundancy(self):
+        redparts = [[('Jane', 'J'), ('Kate', 'K'), ('J', 'J'), ('K', 'K')],
+                    [('Jane', 'J'), ('Kate', 'K'), ('J', 'J'), ('k', 'k')]]
+        nonredparts = [[('Jane', 'J'), ('Kate', 'K')],
+                       [('Jane', 'J'), ('Kate', 'K'), ('J', 'J')],
+                       [('Jane', 'J'), ('Jill', 'J')]]
+        for rp in redparts:
+            self.assertTrue(peoplenames.name_redundancy(rp))
+        for nrp in nonredparts:
+            self.assertFalse(peoplenames.name_redundancy(nrp))
+
 if __name__ == '__main__':
     unittest.main()
