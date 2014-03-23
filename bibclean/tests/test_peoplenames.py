@@ -47,6 +47,15 @@ class TestUnicodeFunctions(unittest.TestCase):
         tnme = ("O'Suilleabhain", 'Jorg Tanjo')
         self.assertEqual(rnme, tnme)
 
+    def test_get_unicode_name(self):
+        testsets = [
+            (('Φοίβη', 'Φ'), ('Phoibe', 'P')),
+            (('Phoibe', 'P'), ('Φ', 'Φ'))
+        ]
+        for ts in testsets:
+            self.assertEqual(ts[0], peoplenames.get_unicode_name(ts[0], ts[1]),
+                             msg=str(ts[0]))
+
 
 class TestListFunctions(unittest.TestCase):
     def test_break_name(self):
