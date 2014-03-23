@@ -21,7 +21,8 @@ class TestListFunctions(unittest.TestCase):
                  [[('Smith', 'S')], [('Jane', 'J'), ('Kate', 'K')]],
                  [[("O'Brian", 'O')], [('James', 'J'), ('T', 'T')]]]
         for idx, name in enumerate(names):
-            self.assertEqual(peoplenames.break_name(name), tnmes[idx])
+            self.assertEqual(peoplenames.break_name(name), tnmes[idx],
+                             msg=str(name))
 
     def test_break_name_simple(self):
         name = ('Smith', 'Jane Kate')
@@ -41,7 +42,8 @@ class TestListFunctions(unittest.TestCase):
         parts = [('Jane', 'J'), ('Kate', 'K')]
         tprts = [['Jane', 'Kate'], ['J', 'K']]
         for idx, tprt in enumerate(tprts):
-            self.assertEqual(tprt, peoplenames.part_comp(parts, idx))
+            self.assertEqual(tprt, peoplenames.part_comp(parts, idx),
+                             msg=str(tprt))
 
     def test_inv_idx(self):
         self.assertEqual([0, 2, 3], peoplenames.inv_idx([1, 4], 5))
@@ -54,7 +56,8 @@ class TestNameComparisons(unittest.TestCase):
             (1.75+1.75/2+1/4, ('Ó Súilleabháin', 'Jörg Tanjō'),
              ("O'Suilleabhain", 'Jorg T.'))]
         for ns in namesets:
-            self.assertEqual(ns[0], peoplenames.name_comp(ns[1], ns[2]))
+            self.assertEqual(ns[0], peoplenames.name_comp(ns[1], ns[2]),
+                             msg=str(ns))
 
     def test_name_redundancy(self):
         redparts = [[('Jane', 'J'), ('Kate', 'K'), ('J', 'J'), ('K', 'K')],
@@ -63,9 +66,9 @@ class TestNameComparisons(unittest.TestCase):
                        [('Jane', 'J'), ('Kate', 'K'), ('J', 'J')],
                        [('Jane', 'J'), ('Jill', 'J')]]
         for rp in redparts:
-            self.assertTrue(peoplenames.name_redundancy(rp))
+            self.assertTrue(peoplenames.name_redundancy(rp), msg=str(rp))
         for nrp in nonredparts:
-            self.assertFalse(peoplenames.name_redundancy(nrp))
+            self.assertFalse(peoplenames.name_redundancy(nrp), msg=str(nrp))
 
 if __name__ == '__main__':
     unittest.main()
