@@ -120,7 +120,7 @@ def name_comp(a, b):
 reRepeatBlock = regex.compile(r'^(.*?)\1*$')
 
 
-def name_redundancy(parts):
+def name_repeat_block_length(parts):
     initials = ''.join([p[1].capitalize() for p in parts])
     initials_repeat_block = reRepeatBlock.search(initials).group(1)
     if initials_repeat_block != initials:
@@ -129,9 +129,13 @@ def name_redundancy(parts):
         for fidx in range(0, lirb):
             if len(set(
                     [p[0] for p in parts[fidx:li:lirb] if p[0] != p[1]])) > 1:
-                return False
-        return True
-    return False
+                return li
+        return lirb
+    return len(initials)
+
+
+def name_redundancy(parts):
+    return len(parts) != name_repeat_block_length(parts)
 
 
 def remove_redundancy(parts):
@@ -140,11 +144,12 @@ def remove_redundancy(parts):
 
 def fullest_name(a, b):
     """Temp returns longest of a or b"""
+    name = list(a)
     if len(a[0]) < len(b[0]):
-        a[0] = b[0]
+        name[0] = b[0]
     if len(a[1]) < len(b[1]):
-        a[1] = b[1]
-    return a
+        name[1] = b[1]
+    return tuple(name)
 
 
 def name_to_ascii(name):

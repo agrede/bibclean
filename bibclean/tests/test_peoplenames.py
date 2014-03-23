@@ -59,17 +59,6 @@ class TestNameComparisons(unittest.TestCase):
             self.assertEqual(ns[0], peoplenames.name_comp(ns[1], ns[2]),
                              msg=str(ns))
 
-    def test_name_redundancy(self):
-        redparts = [[('Jane', 'J'), ('Kate', 'K'), ('J', 'J'), ('K', 'K')],
-                    [('Jane', 'J'), ('Kate', 'K'), ('J', 'J'), ('k', 'k')]]
-        nonredparts = [[('Jane', 'J'), ('Kate', 'K')],
-                       [('Jane', 'J'), ('Kate', 'K'), ('J', 'J')],
-                       [('Jane', 'J'), ('Jill', 'J')]]
-        for rp in redparts:
-            self.assertTrue(peoplenames.name_redundancy(rp), msg=str(rp))
-        for nrp in nonredparts:
-            self.assertFalse(peoplenames.name_redundancy(nrp), msg=str(nrp))
-
     def test_fullest_name(self):
         namesets = [
             (
@@ -96,6 +85,29 @@ class TestNameComparisons(unittest.TestCase):
         for ns in namesets:
             self.assertEqual(ns[0], peoplenames.fullest_name(ns[1], ns[2]),
                              msg=str(ns[0]))
+
+
+class TestNameRedundancies(unittest.TestCase):
+    def test_name_repeat_block_length(self):
+        testsets = [
+            (2, [('Jane', 'J'), ('Kate', 'K'), ('J', 'J'), ('K', 'K')]),
+            (2, [('Jane', 'J'), ('Kate', 'K'), ('J', 'J'), ('k', 'k')]),
+            (2, [('Jane', 'J'), ('Kate', 'K')]),
+            (3, [('Jane', 'J'), ('Kate', 'K'), ('J', 'J')]),
+            (2, [('Jane', 'J'), ('Jill', 'J')])
+        ]
+        for ts in testsets:
+            self.assertEqual(ts[0],
+                             peoplenames.name_repeat_block_length(ts[1]),
+                             msg=str(ts[1]))
+
+    def test_name_redundancy(self):
+        self.assertTrue(
+            peoplenames.name_redundancy(
+                [('Jane', 'J'), ('Kate', 'K'), ('J', 'J'), ('K', 'K')]))
+        self.assertFalse(peoplenames.name_redundancy(
+            [('Jane', 'J'), ('Kate', 'K')]))
+
 
 if __name__ == '__main__':
     unittest.main()
