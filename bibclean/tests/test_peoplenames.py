@@ -108,6 +108,21 @@ class TestNameRedundancies(unittest.TestCase):
         self.assertFalse(peoplenames.name_redundancy(
             [('Jane', 'J'), ('Kate', 'K')]))
 
+    def test_name_remove_redundancy(self):
+        testsets = [
+            (
+                [('Jane', 'J'), ('Kate', 'K')],
+                [('Jane', 'J'), ('Kate', 'K'), ('J', 'J'), ('K', 'K')]
+            ),
+            (
+                [('Jane', 'J')],
+                [('J', 'J'), ('Jane', 'J')]
+            )
+        ]
+        for ts in testsets:
+            self.assertEqual(ts[0], peoplenames.remove_redundancies(ts[1]),
+                             msg=str(ts[0]))
+
 
 if __name__ == '__main__':
     unittest.main()

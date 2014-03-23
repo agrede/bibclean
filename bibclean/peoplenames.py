@@ -138,8 +138,15 @@ def name_redundancy(parts):
     return len(parts) != name_repeat_block_length(parts)
 
 
-def remove_redundancy(parts):
-    pass
+def remove_redundancies(parts):
+    final_parts = []
+    nrbl = name_repeat_block_length(parts)
+    pl = len(parts)
+    if pl == nrbl:
+        return parts
+    for fidx in range(0, nrbl):
+        final_parts.append(max(parts[fidx:pl:nrbl], key=lambda x: len(x[0])))
+    return final_parts
 
 
 def fullest_name(a, b):
