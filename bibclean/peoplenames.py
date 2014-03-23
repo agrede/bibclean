@@ -121,6 +121,11 @@ reRepeatBlock = regex.compile(r'^(.*?)\1*$')
 
 
 def name_repeat_block_length(parts):
+    """
+    Gets the length of the repeating sequence of names
+
+    e.g. 'S.R.A. Stephen Robert Andrew' has the repetition 'SRASRA' -> 3
+    """
     initials = ''.join([p[1].capitalize() for p in parts])
     initials_repeat_block = reRepeatBlock.search(initials).group(1)
     if initials_repeat_block != initials:
@@ -135,10 +140,16 @@ def name_repeat_block_length(parts):
 
 
 def name_redundancy(parts):
+    """True if name appears to have redundancies"""
     return len(parts) != name_repeat_block_length(parts)
 
 
 def remove_redundancies(parts):
+    """
+    Removes redundancies in name parts
+
+    e.g. 'Robert James R.J.' -> 'Robert James'
+    """
     final_parts = []
     nrbl = name_repeat_block_length(parts)
     pl = len(parts)
@@ -150,6 +161,7 @@ def remove_redundancies(parts):
 
 
 def name_part_in_parts(part, parts):
+    """Returns index of name parts location in parts or None"""
     if part[0] in part_comp(parts, 0):
         return part_comp(parts, 0).index(part[0])
     elif name_to_ascii(part[0]) in name_to_ascii(part_comp(parts, 0)):
@@ -165,7 +177,7 @@ def name_part_in_parts(part, parts):
 
 
 def fullest_name(a, b):
-    """Temp returns longest of a or b"""
+    """Using two equivalent names, tries to return full name"""
     name = ['', '']
     ap = break_name(a)
     bp = break_name(b)
@@ -196,6 +208,7 @@ def fullest_name(a, b):
 
 
 def get_unicode_name(a, b):
+    """Of two seemingly equal name parts, returns the best one"""
     if (a == b):
         return a
     a_ascii = a == name_to_ascii(a)
@@ -220,7 +233,7 @@ def get_unicode_name(a, b):
 
 def name_to_ascii(name):
     """
-    Changes names to pseudo-ASCII equivilent.
+    Changes lists of names to pseudo-ASCII equivilent keeping structure.
 
     e.g. ('Ó Súilleabháin', 'Jörg Tanjō') -> ("O'Suilleabhain", 'Jorg Tanjo')
     """
@@ -228,12 +241,18 @@ def name_to_ascii(name):
 
 
 def single_name_to_ascii(name):
+    """
+    Changes names to pseudo-ASCII equivilent.
+
+    e.g. 'Ó Súilleabháin' -> "O'Suilleabhain"
+    """
     name = regex.sub(r'\bÓ\s?(\p{Lu})', 'O\'\g<1>', name)
     name = regex.sub(r'`', '\'', unidecode(name))
     return name
 
 
 def rec_apply(function, item):
+    """Recursively apply function to list types keeping structure"""
     itype = type(item)
     if itype is set:
         return set([rec_apply(function, itm) for itm in item])
