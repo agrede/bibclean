@@ -317,3 +317,10 @@ for ln, fns in ref.people.items():
                 for idx, con in enumerate(per.contributions):
                     if con is None:
                         print('No Contrib:', ln, fn, '; id:', idx)
+
+
+def myapp(function, arg):
+    return function(arg)
+
+def addtwo(value):
+    return value+2
