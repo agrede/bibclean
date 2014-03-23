@@ -48,7 +48,7 @@ def name_comp(a, b):
     aa = name_to_ascii(a)        # ASCII name
     aap = break_name(aa)         # ASCII parts
     lnap = part_comp(aap[0], 0)  # Full ASCII last name parts
-n    # Name b
+    # Name b
     bp = break_name(b)
     ba = name_to_ascii(b)
     bap = break_name(ba)
@@ -117,7 +117,7 @@ n    # Name b
     return score
 
 
-def name_redundancy(name):
+def name_redundancy(parts):
     pass
 
 
