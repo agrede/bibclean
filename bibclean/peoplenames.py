@@ -166,12 +166,56 @@ def name_part_in_parts(part, parts):
 
 def fullest_name(a, b):
     """Temp returns longest of a or b"""
-    name = list(a)
-    if len(a[0]) < len(b[0]):
-        name[0] = b[0]
-    if len(a[1]) < len(b[1]):
-        name[1] = b[1]
+    name = ['', '']
+    ap = break_name(a)
+    bp = break_name(b)
+    ap[1] = remove_redundancies(ap[1])
+    bp[1] = remove_redundancies(bp[1])
+    if len(ap[0]) < len(bp[0]):
+        tmp = ap[0]
+        ap[0] = bp[0]
+        bp[0] = tmp
+    if len(ap[1]) < len(bp[1]):
+        tmp = ap[1]
+        ap[1] = bp[1]
+        bp[1] = tmp
+    for idx in range(0, 2):
+        nps = []
+        anps = ap[idx]
+        bnps = bp[idx]
+        for anp in anps:
+            bidx = name_part_in_parts(anp, bnps)
+            if bidx is not None:
+                nps.append(get_unicode_name(anp, bnps[bidx]))
+            else:
+                nps.append(anp)
+            if nps[-1][0] == nps[-1][1]:
+                nps[-1] = (''.join([nps[-1][0], '.']), nps[-1][1])
+        name[idx] = ' '.join(part_comp(nps, 0))
     return tuple(name)
+
+
+def get_unicode_name(a, b):
+    if (a == b):
+        return a
+    a_ascii = a == name_to_ascii(a)
+    b_ascii = b == name_to_ascii(b)
+    a_init = a[0] == a[1]
+    b_init = b[0] == b[1]
+    if a_init and b_init:
+        if not b_ascii:
+            return b
+        else:
+            return a
+    elif a_init or b_init:
+        if not b_init:
+            return b
+        else:
+            return a
+    elif a_ascii:
+        return b
+    else:
+        return a
 
 
 def name_to_ascii(name):
