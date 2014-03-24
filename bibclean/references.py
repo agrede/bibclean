@@ -1,27 +1,21 @@
-from pyzotero import zotero
 from peoplenames import name_comp, name_to_ascii, fullest_name
+from yapsy.IPlugin import IPlugin
 import weakref
 
 
-class References(object):
+class References(IPlugin):
     """
     Parent of reference sources
     """
-    def __init__(self, dbc, dbc_params, *cargs, **kwargs):
+    name = "Normal References"
+
+    def __init__(self, *cargs, **kwargs):
         self.test = kwargs.get('test', False)
-        self.dbc = zotero.Zotero(dbc_params['library_id'],
-                                 'user', dbc_params['api_key'])
-        self.dbc_params = dbc_params
         self.items = []
         self.people = {}
 
     def get_all(self):
-        items_raw = self.dbc.everything(self.dbc.top())
-        for item_raw in items_raw:
-            self.add_item(item_raw)
-
-    def add_item(self, raw):
-        self.items.append(Item(self, raw))
+        pass
 
     def get_person(self, name):
         if not name[0] in self.people:
@@ -31,51 +25,30 @@ class References(object):
         return self.people[name[0]][name[1]]
 
 
-class Item(object):
+class Item(IPlugin):
     """
     Item
     """
-    def __init__(self, parent, raw):
-        self._raw = raw
+    name = "Normal Item"
+
+    def __init__(self, parent, *cargs, **kwargs):
         self.parent = weakref.proxy(parent)
         self.contributors = []
-        self._add_contributor()
 
     def update(self):
-        if self.parent.test:
-            return True
-        if self.parent.dbc.check_items([self._raw]):
-            try:
-                self._raw = self.parent.update_item(self._raw)
-                return True
-            except:
-                raise
-        return False
+        pass
+
+    def update_contributor(self, idx, name):
+        pass
 
     def _update_field(self, field, value):
-        tmp = self._raw[field] = value
-        self._raw[field] = value
-        try:
-            self.update()
-        except:
-            self._raw[field] = tmp
-            raise
+        pass
 
     def _field_value(self, field):
-        if field in self._raw:
-            return self._raw[field]
-        else:
-            return None
+        pass
 
-    def _add_contributor(self):
-        if 'creators' in self._raw:
-            for creator in self._raw['creators']:
-                if 'firstName' in creator and 'lastName' in creator:
-                    name = (creator['lastName'], creator['firstName'])
-                    person = self.parent.get_person(name)
-                    contrib = Contributor(self, person, name)
-                    self.contributors.append(contrib)
-                    person.contributions.add(contrib)
+    def _add_contributors(self):
+        pass
 
     @property
     def title(self):
@@ -87,11 +60,11 @@ class Item(object):
 
     @property
     def title_short(self):
-        return self._field_value('shortTitle')
+        return self._field_value('title_short')
 
-    @title.setter
-    def title(self, value):
-        return self._update_field('shortTitle', value)
+    @title_short.setter
+    def title_short(self, value):
+        return self._update_field('title_short', value)
 
     @property
     def url(self):
@@ -103,19 +76,19 @@ class Item(object):
 
     @property
     def journal(self):
-        return self._field_value('publicationTitle')
+        return self._field_value('journal')
 
     @journal.setter
     def journal(self, value):
-        self._update_field('publicationTitle', value)
+        self._update_field('journal', value)
 
     @property
     def journal_abbrev(self):
-        return self._field_value('journalAbbreviation')
+        return self._field_value('journal_abbrev')
 
     @journal_abbrev.setter
     def journal_abbrev(self, value):
-        self._update_field('journalAbbreviation', value)
+        self._update_field('journal_abbrev', value)
 
     @property
     def date(self):
@@ -124,12 +97,6 @@ class Item(object):
     @date.setter
     def date(self, value):
         self._update_field('date', value)
-
-    def update_contributor(self, idx, name):
-        if 'creators' in self._raw:
-            self._raw['creators'][idx]['lastName'] = name[0]
-            self._raw['creators'][idx]['firstName'] = name[1]
-            self.update()
 
 
 class Person(object):
