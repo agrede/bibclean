@@ -2,7 +2,6 @@ import regex
 import references
 import json
 import urllib.request
-from dateutil import parser
 
 
 def remove_ezproxies(items, *args, **kwargs):
@@ -42,15 +41,23 @@ def remove_ezproxy(items, proxy):
                                     if m is not None])
 
 
-def fix_dates(items):
-    reODT = regex.compile(r'^\d{4}(?:-\d{2}){0,2}$')
-    reFDY = regex.compile(r'\b(\d{1,2})\b')
-    needs_fix = []
-    for item in items:
-        if not reODT.search(item.date) and item.date != '':
-            date_obj = parser.parse(item.date)
-            date_days = [int(d) for d in reFDY.findall(item.date)]
-            if date_obj.day != date_obj.month and date_obj.day in date_days:
-                item.date = date_obj.strftime('%Y-%m-%d')
-            else:
-                needs_fix.append((item, date_obj, date_days))
+def dates_to_fix(items):
+    return [item for item in items if item.date is not item.formated_date()]
+
+
+def fix_dates(items, datestrs=None):
+    """
+    Sets items[idx].date to items[idx].formatted_date() or op. datestrs[idx]
+
+    Optional param datestrs:
+       Must be same length as items
+       datestrs[idx] = None uses items[idx].formatted_date() for that idx
+    """
+    if datestrs is not None and len(datestrs) is not len(items):
+        return None
+
+    for idx, item in enumerate(items):
+        if datestrs is None or datestrs[idx] is None:
+            item.date = item.formatted_date()
+        else:
+            item.date = datestrs[idx]
