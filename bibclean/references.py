@@ -1,4 +1,5 @@
 from peoplenames import name_comp, name_to_ascii, fullest_name
+from bibdates import BibDateParser
 import weakref
 
 
@@ -12,6 +13,7 @@ class References:
         self.test = kwargs.get('test', False)
         self.items = []
         self.people = {}
+        self.date_parser = BibDateParser()
 
     def get_all(self):
         pass
@@ -97,6 +99,9 @@ class Item:
     @date.setter
     def date(self, value):
         self._update_field('date', value)
+
+    def formatted_date(self):
+        return self.parent.date_parser.parse_to_str(self.date)
 
 
 class Person:
