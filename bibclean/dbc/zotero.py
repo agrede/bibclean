@@ -3,13 +3,11 @@ from References import References, Item, Contributor
 
 
 class ZoteroRefs(References):
-    """
-    Ref
-    """
+    """Zotero based References"""
     name = "ZoteroRefs"
 
     def __init__(self, *cargs, **kwargs):
-        super().__init__(cargs=cargs, kwargs=kwargs)
+        super().__init__(*cargs, **kwargs)
         library_id = kwargs.get('library_id', None)
         api_key = kwargs.get('api_key', None)
         self.dbc = zotero.Zotero(library_id, 'user', api_key)
@@ -21,10 +19,12 @@ class ZoteroRefs(References):
 
 
 class ZoteroItem(Item):
+    """Extention to Item class for Zotero connectivity"""
+
     name = "ZoteroItem"
 
     def __init__(self, parent, *cargs, **kwargs):
-        super().__init__(cargs=cargs, kwargs=kwargs)
+        super().__init__(parent, *cargs, **kwargs)
         self._raw = kwargs.get('raw', None)
         self._add_contributors()
         self._field_names = {'title': 'title', 'title_short': 'shortTitle',
@@ -43,11 +43,11 @@ class ZoteroItem(Item):
                 raise
         return False
 
-        def update_contributor(self, idx, name):
-            if 'creators' in self._raw:
-                self._raw['creators'][idx]['lastName'] = name[0]
-                self._raw['creators'][idx]['firstName'] = name[1]
-                self.update()
+    def update_contributor(self, idx, name):
+        if 'creators' in self._raw:
+            self._raw['creators'][idx]['lastName'] = name[0]
+            self._raw['creators'][idx]['firstName'] = name[1]
+            self.update()
 
     def _update_field(self, field, value):
         key = self._field_names[field]

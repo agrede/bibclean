@@ -1,9 +1,8 @@
 from peoplenames import name_comp, name_to_ascii, fullest_name
-from yapsy.IPlugin import IPlugin
 import weakref
 
 
-class References(IPlugin):
+class References:
     """
     Parent of reference sources
     """
@@ -25,7 +24,7 @@ class References(IPlugin):
         return self.people[name[0]][name[1]]
 
 
-class Item(IPlugin):
+class Item:
     """
     Item
     """
@@ -34,6 +33,7 @@ class Item(IPlugin):
     def __init__(self, parent, *cargs, **kwargs):
         self.parent = weakref.proxy(parent)
         self.contributors = []
+        self._add_contributors()
 
     def update(self):
         pass
@@ -99,7 +99,7 @@ class Item(IPlugin):
         self._update_field('date', value)
 
 
-class Person(object):
+class Person:
     """
     Person
     """
@@ -162,7 +162,7 @@ class Person(object):
         return ' '.join(self.ascii_name) < ' '.join(other.ascii_name)
 
 
-class Contributor(object):
+class Contributor:
     """
     Contributor
     """
