@@ -20,7 +20,6 @@ class ZoteroRefs(References):
 
 class ZoteroItem(Item):
     """Extention to Item class for Zotero connectivity"""
-
     name = "ZoteroItem"
 
     def __init__(self, parent, *cargs, **kwargs):

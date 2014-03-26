@@ -1,4 +1,4 @@
-from peoplenames import name_comp, name_to_ascii, fullest_name
+from peoplenames import name_comp, name_to_ascii, fullest_name, is_name
 from bibdates import BibDateParser
 import weakref
 
@@ -24,6 +24,16 @@ class References:
         if name[1] not in self.people[name[0]]:
             self.people[name[0]][name[1]] = Person(name)
         return self.people[name[0]][name[1]]
+
+    def remove_person_if_empty(self, name):
+        try:
+            if len(self.people[name[0]][name[1]]) < 1:
+                del(self.people[name[0]][name[1]])
+                return True
+            else:
+                return False
+        except:
+            return True
 
 
 class Item:
@@ -58,7 +68,7 @@ class Item:
 
     @title.setter
     def title(self, value):
-        return self._update_field('title', value)
+        self._update_field('title', value)
 
     @property
     def title_short(self):
@@ -66,7 +76,7 @@ class Item:
 
     @title_short.setter
     def title_short(self, value):
-        return self._update_field('title_short', value)
+        self._update_field('title_short', value)
 
     @property
     def url(self):
@@ -94,7 +104,7 @@ class Item:
 
     @property
     def date(self):
-        self._field_value('date')
+        return self._field_value('date')
 
     @date.setter
     def date(self, value):
@@ -122,10 +132,26 @@ class Person:
 
     @name.setter
     def name(self, value):
+        not_set = []
         for c in self.contributions:
             if c.name != value:
-                c.name = value
-        self._name = value
+                try:
+                    c.name = value
+                except Exception as e:
+                    not_set.append((c, str(e)))
+        if len(not_set) is len(self.contributions):
+            raise Exception('\n'.join(
+                ['Failed to set ALL contributor names:'] +
+                [x[1] for x in not_set]
+            ))
+        elif len(not_set) > 0:
+            raise Exception('\n'.join(
+                ['Failed to set SOME contributor names:'] +
+                [x[1] for x in not_set]
+            ))
+            self._name = value
+        else:
+            self._name = value
 
     def compare(self, person):
         return name_comp(self.name, person.name)
@@ -188,8 +214,12 @@ class Contributor:
     def name(self, value):
         idx = self.item.contributors.index(self)
         if self._name != value:
-            self.item.update_contributor(idx, value)
-            self._name = value
+            try:
+                self.item.update_contributor(idx, value)
+            except:
+                raise
+            else:
+                self._name = value
 
     @property
     def person(self):
@@ -197,10 +227,16 @@ class Contributor:
 
     @person.setter
     def person(self, value):
-        value.contributions.add(self)
-        self._person.contributions.remove(self)
-        self._person = weakref.proxy(value)
-        self.name = value.name
+        try:
+            self.name = value.name
+        except:
+            raise
+        else:
+            prev_name = self._person.name
+            value.contributions.add(self)
+            self._person.contributions.remove(self)
+            self._person = weakref.proxy(value)
+            self.item.parent.remove_person_if_empty(prev_name)
 
     def cocontributors(self):
         return [con for con in self.item.contributors if con is not self]
