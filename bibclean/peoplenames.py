@@ -267,3 +267,18 @@ def rec_apply(function, item):
         return [rec_apply(function, itm) for itm in item]
     else:
         return function(item)
+
+
+def is_name(name):
+    try:
+        if not (type(name) is tuple or type(name) is list):
+            return False
+        if len(name) is not 2:
+            return False
+        for idx in range(0, 2):
+            if type(name[idx]) is not str and len(name[idx]) < 1:
+                return False
+    except:
+        return False
+    else:
+        return True
