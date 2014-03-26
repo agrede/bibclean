@@ -132,26 +132,29 @@ class Person:
 
     @name.setter
     def name(self, value):
-        not_set = []
-        for c in self.contributions:
-            if c.name != value:
-                try:
-                    c.name = value
-                except Exception as e:
-                    not_set.append((c, str(e)))
-        if len(not_set) is len(self.contributions):
-            raise Exception('\n'.join(
-                ['Failed to set ALL contributor names:'] +
-                [x[1] for x in not_set]
-            ))
-        elif len(not_set) > 0:
-            raise Exception('\n'.join(
-                ['Failed to set SOME contributor names:'] +
-                [x[1] for x in not_set]
-            ))
-            self._name = value
+        if is_name(value):
+            not_set = []
+            for c in self.contributions:
+                if c.name != value:
+                    try:
+                        c.name = value
+                    except Exception as e:
+                        not_set.append((c, str(e)))
+            if len(not_set) is len(self.contributions):
+                raise Exception('\n'.join(
+                    ['Failed to set ALL contributor names:'] +
+                    [x[1] for x in not_set]
+                ))
+            elif len(not_set) > 0:
+                raise Exception('\n'.join(
+                    ['Failed to set SOME contributor names:'] +
+                    [x[1] for x in not_set]
+                ))
+                self._name = value
+            else:
+                self._name = value
         else:
-            self._name = value
+            raise Exception('Not a valid name')
 
     def compare(self, person):
         return name_comp(self.name, person.name)
