@@ -20,8 +20,9 @@ class ZoteroRefs(References):
             raise bexc.RefGetError(
                 'Could not retrieve all items').with_traceback(
                 exc.__traceback__)
-        for item_raw in items_raw:
-            self.items.append(ZoteroItem(self, raw=item_raw))
+        else:
+            for item_raw in items_raw:
+                self.items.append(ZoteroItem(self, raw=item_raw))
 
 
 class ZoteroItem(Item):
