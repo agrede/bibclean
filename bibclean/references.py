@@ -1,10 +1,21 @@
 from peoplenames import name_comp, name_to_ascii, fullest_name, is_name
-from yapsy.IPlugin import IPlugin
 from bibdates import BibDateParser
 import weakref
 
 
-class References(IPlugin):
+class PluginMount(type):
+    def __init__(cls, name, bases, attrs):
+        if not hasattr(cls, 'plugins'):
+            cls.plugins = []
+        else:
+            cls.register_plugin(cls)
+
+    def register_plugin(cls, plugin):
+        instance = plugin
+        cls.plugins.append(instance)
+
+
+class References(metaclass=PluginMount):
     """
     Parent of reference sources
     """
