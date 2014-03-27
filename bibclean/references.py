@@ -1,13 +1,14 @@
 from peoplenames import name_comp, name_to_ascii, fullest_name, is_name
+from yapsy.IPlugin import IPlugin
 from bibdates import BibDateParser
 import weakref
 
 
-class References:
+class References(IPlugin):
     """
     Parent of reference sources
     """
-    name = "Normal References"
+    name = "Base References"
 
     def __init__(self, *cargs, **kwargs):
         self.test = kwargs.get('test', False)
@@ -29,6 +30,8 @@ class References:
         try:
             if len(self.people[name[0]][name[1]]) < 1:
                 del(self.people[name[0]][name[1]])
+                if len(self.people[name[0]]) < 1:
+                    del(self.people[name[0]])
                 return True
             else:
                 return False
@@ -40,7 +43,7 @@ class Item:
     """
     Item
     """
-    name = "Normal Item"
+    name = "Base Item"
 
     def __init__(self, parent, *cargs, **kwargs):
         self.parent = weakref.proxy(parent)

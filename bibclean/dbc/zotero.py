@@ -11,7 +11,12 @@ class ZoteroRefs(References):
         super().__init__(*cargs, **kwargs)
         library_id = kwargs.get('library_id', None)
         api_key = kwargs.get('api_key', None)
-        self.dbc = zotero.Zotero(library_id, 'user', api_key)
+        try:
+            self.dbc = zotero.Zotero(library_id, 'user', api_key)
+        except Exception as exc:
+            raise bexc.RefConnectError(
+                'Could not connect to zotero').with_traceback(
+                exc.__traceback__)
 
     def get_all(self):
         try:
