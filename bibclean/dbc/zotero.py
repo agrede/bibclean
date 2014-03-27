@@ -1,5 +1,5 @@
 from pyzotero import zotero
-from References import References, Item, Contributor
+from references import References, Item, Contributor
 import exceptions as bexc
 
 
