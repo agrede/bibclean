@@ -143,35 +143,44 @@ class Person:
     def compare(self, person):
         return name_comp(self.name, person.name)
 
-    def cocontributors(self):
-        cocontrib = []
+    def cocontributors(self, ignore=[]):
+        cocons = []
         counts = []
         for contrib in self.contributions:
             for cocon in contrib.cocontributors():
-                if cocon.person not in cocontrib:
-                    cocontrib.append(cocon.person)
+                if cocon.person in ignore:
+                    continue
+                elif cocon.person not in cocons:
+                    cocons.append(cocon.person)
                     counts.append(1)
                 else:
-                    idx = cocontrib.index(cocon.person)
+                    idx = cocons.index(cocon.person)
                     counts[idx] += 1
-        return zip(cocontrib, counts)
+        return zip(cocons, counts)
 
-    def condensed_cocontributors(self, min_score):
-        cocontribs = sorted(self.cocontributors(),
-                            key=lambda c: c[0].ascii_name)
-        cond_cocontrib = []
-        cur_cocontrib = list(cocontribs[0])
-        for cocon in cocontribs[1:]:
-            if cur_cocontrib[0].compare(cocon[0]) >= min_score:
-                cur_cocontrib[1] += cocon[1]
-                if cocon[0].name is fullest_name(cur_cocontrib[0].name,
+    def condensed_cocontributors(self, min_score, ignore=[]):
+        # Get uncondensed list of cocontribs, ignore not used to catch more
+        cocons = sorted(self.cocontributors(),
+                        key=lambda c: c[0].ascii_name)
+        cond_cocons = []
+        cur_cocon = list(cocons[0])
+        # ignore_flag is True when any of similar people is in ignore
+        ignore_flag = cur_cocon[0] in ignore
+        for cocon in cocons[1:]:
+            if cur_cocon[0].compare(cocon[0]) >= min_score:
+                ignore_flag = ignore_flag or cocon[0] in ignore
+                cur_cocon[1] += cocon[1]
+                if cocon[0].name is fullest_name(cur_cocon[0].name,
                                                  cocon[0].name):
-                    cur_cocontrib[0] = cocon[0]
+                    cur_cocon[0] = cocon[0]
             else:
-                cond_cocontrib.append(cur_cocontrib)
-                cur_cocontrib = list(cocon)
-        cond_cocontrib.append(cur_cocontrib)
-        return cond_cocontrib
+                if not ignore_flag:
+                    cond_cocons.append(cur_cocon)
+                cur_cocon = list(cocon)
+                ignore_flag = cur_cocon[0] in ignore
+        if not ignore_flag:
+            cond_cocons.append(cur_cocon)
+        return cond_cocons
 
     def complex_compare(self, person, min_score):
         simp = self.compare(person)
@@ -179,9 +188,11 @@ class Person:
             return 0
         comp_list = sorted(
             [(x[0], x[1], 'a')
-             for x in self.condensed_cocontributors(min_score)]
+             for x in self.condensed_cocontributors(min_score,
+                                                    ignore=[person])]
             + [(x[0], x[1], 'b')
-               for x in person.condensed_cocontributors(min_score)],
+               for x in person.condensed_cocontributors(min_score,
+                                                        ignore=[self])],
             key=lambda x: x[0].ascii_name
         )
         cur_score = 0
