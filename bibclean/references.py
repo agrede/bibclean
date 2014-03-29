@@ -157,20 +157,41 @@ class Person:
         return zip(cocontrib, counts)
 
     def condensed_cocontributors(self, min_score):
-        cocontribs = sorted(self.cocontributors, key=lambda c: c[0].ascii_name)
+        cocontribs = sorted(self.cocontributors(),
+                            key=lambda c: c[0].ascii_name)
         cond_cocontrib = []
-        cur_cocontrib = cocontribs.pop()
-        for cocon in cocontribs:
-            if name_comp(cur_cocontrib[0].name, cocon[0].name) >= min_score:
+        cur_cocontrib = list(cocontribs[0])
+        for cocon in cocontribs[1:]:
+            if cur_cocontrib[0].compare(cocon[0]) >= min_score:
                 cur_cocontrib[1] += cocon[1]
                 if cocon[0].name is fullest_name(cur_cocontrib[0].name,
                                                  cocon[0].name):
                     cur_cocontrib[0] = cocon[0]
             else:
                 cond_cocontrib.append(cur_cocontrib)
-                cur_cocontrib = cocon
+                cur_cocontrib = list(cocon)
         cond_cocontrib.append(cur_cocontrib)
         return cond_cocontrib
+
+    def complex_compare(self, person, min_score):
+        simp = self.compare(person)
+        if simp == 0:
+            return 0
+        comp_list = sorted(
+            [(x[0], x[1], 'a')
+             for x in self.condensed_cocontributors(min_score)]
+            + [(x[0], x[1], 'b')
+               for x in person.condensed_cocontributors(min_score)],
+            key=lambda x: x[0].ascii_name
+        )
+        cur_score = 0
+        a = comp_list[0]
+        for b in comp_list[1:]:
+            cmpscore = a[0].compare(b[0])
+            if a[2] is not b[2] and cmpscore >= min_score:
+                cur_score += cmpscore*(a[1]+b[1])
+            a = b
+        return simp*cur_score
 
     def __str__(self):
         return ''.join(['Person: ', ', '.join(self.name), '; Items: ',

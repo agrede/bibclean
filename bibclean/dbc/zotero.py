@@ -36,14 +36,18 @@ class ZoteroItem(Item):
     """Extention to Item class for Zotero connectivity"""
     name = "ZoteroItem"
 
+    _field_names = {
+        'title': 'title',
+        'title_short': 'shortTitle',
+        'url': 'url',
+        'journal': 'publicationTitle',
+        'journal_abbrev': 'journalAbbreviation',
+        'date': 'date'
+    }
+
     def __init__(self, parent, *cargs, **kwargs):
-        super().__init__(parent, *cargs, **kwargs)
         self._raw = kwargs.get('raw', None)
-        self._add_contributors()
-        self._field_names = {'title': 'title', 'title_short': 'shortTitle',
-                             'url': 'url', 'journal': 'publicationTitle',
-                             'journal_abbrev': 'journalAbbreviation',
-                             'date': 'date'}
+        super().__init__(parent, *cargs, **kwargs)
 
     def update(self):
         if self.parent.test:

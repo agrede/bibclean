@@ -282,3 +282,21 @@ def is_name(name):
         return False
     else:
         return True
+
+
+reSLN = regex.compile(r'^[A-Z](?:\'[A-Z])?[a-z]+$')
+
+
+def is_odd_last_name(last_name):
+    if reSLN.search(last_name):
+        return False
+    else:
+        return True
+
+
+def odd_last_names(last_names):
+    olns = []
+    for ln in last_names:
+        if is_odd_last_name(ln):
+            olns.append(ln)
+    return olns
