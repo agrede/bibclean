@@ -26,3 +26,23 @@ class RefUpdateError(BibCleanException):
 class RefNoFieldDefined(BibCleanException):
     """Errors when field is not defined in Item._field_names"""
     pass
+
+
+class RemoteProxyListError(BibCleanException):
+    """When urllib or json parse cannont process request"""
+    pass
+
+
+class RemoteProxyListFormatError(BibCleanException):
+    """Remote Proxy List invalid format"""
+    pass
+
+
+class ProxyFormatError(BibCleanException):
+    """Proxy string is not correct format"""
+    pass
+
+
+class ProxyNameNotFound(BibCleanWarning):
+    """Proxy name is not found in proxy list"""
+    pass

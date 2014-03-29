@@ -5,7 +5,9 @@ import exceptions as bexc
 
 class ZoteroRefs(References):
     """Zotero based References"""
-    name = "ZoteroRefs"
+    name = "Zotero"
+
+    args = {'library_id': str, 'api_key': str}
 
     def __init__(self, *cargs, **kwargs):
         super().__init__(*cargs, **kwargs)
