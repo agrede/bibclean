@@ -300,3 +300,13 @@ def odd_last_names(last_names):
         if is_odd_last_name(ln):
             olns.append(ln)
     return olns
+
+
+reSFN = regex.compile(r'^[A-Z](?:[a-z]+|\.)?(?:\s?[A-Z](?:[a-z]+|\.)?)?$')
+
+
+def is_odd_first_name(first_name):
+    if reSFN.search(first_name):
+        return False
+    else:
+        return True

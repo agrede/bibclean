@@ -186,15 +186,13 @@ class Person:
         simp = self.compare(person)
         if simp == 0:
             return 0
-        comp_list = sorted(
-            [(x[0], x[1], 'a')
-             for x in self.condensed_cocontributors(min_score,
-                                                    ignore=[person])]
-            + [(x[0], x[1], 'b')
-               for x in person.condensed_cocontributors(min_score,
-                                                        ignore=[self])],
-            key=lambda x: x[0].ascii_name
-        )
+        a = [(x[0], x[1], 'a')
+             for x in self.condensed_cocontributors(min_score)]
+        b = [(x[0], x[1], 'b')
+             for x in person.condensed_cocontributors(min_score)]
+        if any(person == x[0] for x in a) or any(self == x[0] for x in b):
+            return 0
+        comp_list = sorted(a+b, key=lambda x: x[0].ascii_name)
         cur_score = 0
         a = comp_list[0]
         for b in comp_list[1:]:
