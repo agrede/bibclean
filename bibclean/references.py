@@ -12,6 +12,7 @@ class References(metaclass=PluginMount):
 
     def __init__(self, *cargs, **kwargs):
         self.test = kwargs.get('test', False)
+        self.change_citename = kwargs.get('change_citename', False)
         self.items = []
         self.people = {}
         self.date_parser = BibDateParser()
@@ -47,13 +48,14 @@ class Item:
 
     def __init__(self, parent, *cargs, **kwargs):
         self.parent = weakref.proxy(parent)
+        self._change_citename = None
         self.contributors = []
         self._add_contributors()
 
     def update(self):
         pass
 
-    def update_contributor(self, idx, name):
+    def update_contributor(self, idx, name, change_citename=None):
         pass
 
     def _update_field(self, field, value):
@@ -64,6 +66,17 @@ class Item:
 
     def _add_contributors(self):
         pass
+
+    @property
+    def change_citename(self):
+        if self._change_citename is None:
+            return self.parent.change_citename
+        else:
+            return self._change_citename
+
+    @change_citename.setter
+    def change_citename(self, value):
+        self._change_citename = value
 
     @property
     def title(self):
@@ -214,29 +227,54 @@ class Contributor:
     """
     Contributor
     """
-    def __init__(self, item, person, name):
+    def __init__(self, item, person, citename, name=None):
         self.item = weakref.proxy(item)
         self._person = weakref.proxy(person)
         self._name = name
+        self._citename = citename
 
     @property
     def ascii_name(self):
-        return name_to_ascii(self._name)
+        return name_to_ascii(self.name)
 
     @property
     def name(self):
-        return self._name
+        if self._name is not None:
+            return self._name
+        else:
+            self._citename
 
     @name.setter
     def name(self, value):
         idx = self.item.contributors.index(self)
-        if self._name != value:
+        if self._name != value and self._citename != value:
             try:
                 self.item.update_contributor(idx, value)
             except:
                 raise
             else:
-                self._name = value
+                if self.parent.change_citename:
+                    self._citename = value
+                    self._name = None
+                else:
+                    self._name = value
+
+    @property
+    def citename(self):
+        return self._citename
+
+    @citename.setter
+    def citename(self, value):
+        if self._citename != value:
+            idx = self.parent.contributors.index(self)
+            try:
+                self.item.update_contributor(idx, value, change_citename=True)
+            except:
+                raise
+            else:
+                self._citename = value
+                if self._name == value:
+                    self._name = None
 
     @property
     def person(self):
