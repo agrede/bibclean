@@ -248,16 +248,19 @@ class Contributor:
     def name(self, value):
         idx = self.item.contributors.index(self)
         if self._name != value and self._citename != value:
+            old_citename = self._citename
+            old_name = self._name
+            if self.parent.change_citename:
+                self._citename = value
+                self._name = None
+            else:
+                self._name = value
             try:
                 self.item.update_contributor(idx, value)
             except:
+                self._citename = old_citename
+                self._name = old_name
                 raise
-            else:
-                if self.parent.change_citename:
-                    self._citename = value
-                    self._name = None
-                else:
-                    self._name = value
 
     @property
     def citename(self):
@@ -267,14 +270,17 @@ class Contributor:
     def citename(self, value):
         if self._citename != value:
             idx = self.parent.contributors.index(self)
+            old_citename = self._citename
+            old_name = self._name
+            self._citename = value
+            if self._name == value:
+                self._name = None
             try:
                 self.item.update_contributor(idx, value, change_citename=True)
             except:
+                self._citename = old_citename
+                self._name = old_name
                 raise
-            else:
-                self._citename = value
-                if self._name == value:
-                    self._name = None
 
     @property
     def person(self):

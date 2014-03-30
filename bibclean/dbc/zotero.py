@@ -1,6 +1,7 @@
 from pyzotero import zotero
 from references import References, Item, Contributor
 import exceptions as bexc
+import regex
 
 
 class ZoteroRefs(References):
@@ -45,6 +46,10 @@ class ZoteroItem(Item):
         'date': 'date'
     }
 
+    reBCN = regex.compile(r'bibcleannames\[([^\]]+)\]')
+    reECN = regex.compile(r'bibcleannames\[\]')
+    reGCN = regex.compile(r'([^,]+),([^=]+)=([^,]+),([^;]+);?')
+
     def __init__(self, parent, *cargs, **kwargs):
         self._raw = kwargs.get('raw', None)
         super().__init__(parent, *cargs, **kwargs)
@@ -60,18 +65,62 @@ class ZoteroItem(Item):
                 raise bexc.RefUpdateError(
                     'Error when updating').with_traceback(exc.__traceback_)
         else:
-            raise bexc.RefUpdateError('Update not properly formated')
+            raise bexc.RefUpdateError('Update not properly formatted')
             return False
 
-    def update_contributor(self, idx, name):
+    def _update_clean_names(self):
+        bibcleannames = []
+        for contrib in self.contributors:
+            if contrib.name != contrib.citename:
+                bibcleannames.append(
+                    '='.join(
+                        [
+                            ','.join(contrib.citename),
+                            ','.join(contrib.name)
+                        ]
+                    )
+                )
+        clean_name_entry = ''.join([
+            'bibcleannames[',
+            ';'.join(bibcleannames),
+            ']'
+        ])
+        if 'extra' not in self._raw:
+            if len(bibcleannames) > 0:
+                self._raw['extra'] = clean_name_entry
+        elif self.reBCN.search(self._raw['extra']):
+            if len(bibcleannames) > 0:
+                self._raw['extra'] = self.reECN.sub(
+                    '',
+                    self.reECN.sub(
+                        clean_name_entry,
+                        self.reBCN.sub(
+                            'bibcleannames[]',
+                            self._raw['extra']
+                        ),
+                        1
+                    )
+                )
+            else:
+                self._raw['extra'] = self.reBCN.sub('', self._raw['extra'])
+        elif len(bibcleannames) > 0:
+            self._raw['extra'] = '\n'.join([
+                self._raw['extra'], clean_name_entry, ''])
+
+    def update_contributor(self, idx, name, change_citename=None):
         if 'creators' in self._raw:
-            old_creator = self._raw['creators'][idx]
-            self._raw['creators'][idx]['lastName'] = name[0]
-            self._raw['creators'][idx]['firstName'] = name[1]
+            old_extra = self._raw.get('extra', None)
+            self._update_clean_names()
+            if self.change_citename or change_citename:
+                old_creator = self._raw['creators'][idx]
+                self._raw['creators'][idx]['lastName'] = name[0]
+                self._raw['creators'][idx]['firstName'] = name[1]
             try:
                 self.update()
             except Exception:
                 self._raw['creators'][idx] = old_creator
+                if 'extra' in self._raw or old_extra is not None:
+                    self._raw['extra'] = old_extra
                 raise
 
     def _update_field(self, field, value):
@@ -107,11 +156,24 @@ class ZoteroItem(Item):
             return None
 
     def _add_contributors(self):
+        clean_names = {}
+        if 'extra' in self._raw:
+            bcns_sets = self.reBCN.findall(self._raw['extra'])
+            for bcns_set in bcns_sets:
+                bcns = self.reGCN.findall(bcns_set)
+                for bcn in bcns:
+                    clean_names[bcn[0]] = bcn[1]
         if 'creators' in self._raw:
             for creator in self._raw['creators']:
                 if 'firstName' in creator and 'lastName' in creator:
-                    name = (creator['lastName'], creator['firstName'])
-                    person = self.parent.get_person(name)
-                    contrib = Contributor(self, person, name)
+                    citename = (creator['lastName'], creator['firstName'])
+                    name = None
+                    person = None
+                    if citename in clean_names:
+                        name = clean_names[citename]
+                        person = self.parent.get_person(name)
+                    else:
+                        person = self.parent.get_person(citename)
+                    contrib = Contributor(self, person, citename, name=name)
                     self.contributors.append(contrib)
                     person.contributions.add(contrib)
