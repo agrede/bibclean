@@ -29,10 +29,10 @@ class References(metaclass=PluginMount):
 
     def remove_person_if_empty(self, name):
         try:
-            if len(self.people[name[0]][name[1]]) < 1:
+            if len(self.people[name[0]][name[1]].contributions) < 1:
                 del(self.people[name[0]][name[1]])
-                if len(self.people[name[0]]) < 1:
-                    del(self.people[name[0]])
+            if len(self.people[name[0]]) < 1:
+                del(self.people[name[0]])
                 return True
             else:
                 return False
