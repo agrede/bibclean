@@ -324,3 +324,74 @@ def myapp(function, arg):
 
 def addtwo(value):
     return value+2
+
+
+class myparser(dateutil.parser.parser):
+    def myparse(self, timestr, default=None,
+                ignoretz=False, tzinfos=None,
+                **kwargs):
+        if not default:
+            default = datetime.datetime.now().replace(hour=0, minute=0,
+                                                      second=0, microsecond=0)
+
+        return self._parse(timestr, **kwargs)
+
+
+b = [mwe.Box(x) for x in ['A', 'B', 'C']]
+o = [mwe.Owner(x) for x in ['Bob', 'John', 'Steve']]
+ic = [[1, 2, 0], [2, 1, 0], [1, 1, 1]]
+
+for idb, bi in enumerate(b):
+    for ido, oi in enumerate(o):
+        for c in range(0, ic[idb][ido]):
+            bi.add_item(oi, ''.join([oi.name, bi.name, str(c+1)]))
+
+
+y = {'A', 'B', 'C'}
+yc = y.copy()
+
+
+def ln_change_scores():
+    lnsc = {}
+    for ln, fns in ref.people.items():
+        lnsc[ln] = 0
+        comp = max(fns.items(), key=lambda x: len(x[1].contributions))[1]
+        for fn, p in fns.items():
+            if p is not comp:
+                lnsc[ln] += comp.compare(p)*len(p.contributions)
+        lnsc[ln] = lnsc[ln]*len(comp.contributions)
+    return sorted(lnsc.items(), key=lambda x: x[1], reverse=True)
+
+
+sfn = ''
+ln = ''
+def change_all(ln, sfn):
+    sp = ref.people[ln][sfn]
+    for p in ref.people[ln].values():
+        if sp != p:
+            tmp = p.contributions.copy()
+            for c in tmp:
+                c.person = sp
+def parse:
+    pass
+
+
+def name_date_range():
+    ndr = {}
+    for ln, fns in ref.people.items():
+        for p in fns.values():
+            try:
+                if ln in ndr:
+                    ndr[ln][0] = min(list(p.contributions) + [ndr[ln][0]],
+                                     key=lambda x: parse(x.item.date))
+                    ndr[ln][1] = max(list(p.contributions) + [ndr[ln][1]],
+                                     key=lambda x: parse(x.item.date))
+                else:
+                    ndr[ln] = [
+                        min(list(p.contributions),
+                            key=lambda x: parse(x.item.date)),
+                        max(list(p.contributions),
+                            key=lambda x: parse(x.item.date))]
+            except:
+                continue
+    return ndr
