@@ -175,6 +175,8 @@ class Person:
         # Get uncondensed list of cocontribs, ignore not used to catch more
         cocons = sorted(self.cocontributors(),
                         key=lambda c: c[0].ascii_name)
+        if len(cocons) < 1:
+            return []
         cond_cocons = []
         cur_cocon = list(cocons[0])
         # ignore_flag is True when any of similar people is in ignore
