@@ -367,7 +367,8 @@ sfn = ''
 ln = ''
 def change_all(ln, sfn):
     sp = ref.people[ln][sfn]
-    for p in ref.people[ln].values():
+    ps = list(ref.people[ln].values())
+    for p in ps:
         if sp != p:
             tmp = p.contributions.copy()
             for c in tmp:
