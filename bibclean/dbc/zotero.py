@@ -85,7 +85,7 @@ class ZoteroItem(Item):
             ';'.join(bibcleannames),
             ']'
         ])
-        if 'extra' not in self._raw:
+        if 'extra' not in self._raw or len(self._raw['extra']) < 1:
             if len(bibcleannames) > 0:
                 self._raw['extra'] = clean_name_entry
         elif self.reBCN.search(self._raw['extra']):
@@ -105,7 +105,7 @@ class ZoteroItem(Item):
                 self._raw['extra'] = self.reBCN.sub('', self._raw['extra'])
         elif len(bibcleannames) > 0:
             self._raw['extra'] = '\n'.join([
-                self._raw['extra'], clean_name_entry, ''])
+                self._raw['extra'], clean_name_entry])
 
     def update_contributor(self, idx, name, change_citename=None):
         if 'creators' in self._raw:

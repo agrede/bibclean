@@ -244,7 +244,7 @@ class Contributor:
         if self._name is not None:
             return self._name
         else:
-            self._citename
+            return self._citename
 
     @name.setter
     def name(self, value):
@@ -252,7 +252,7 @@ class Contributor:
         if self._name != value and self._citename != value:
             old_citename = self._citename
             old_name = self._name
-            if self.parent.change_citename:
+            if self.item.change_citename:
                 self._citename = value
                 self._name = None
             else:
@@ -271,7 +271,7 @@ class Contributor:
     @citename.setter
     def citename(self, value):
         if self._citename != value:
-            idx = self.parent.contributors.index(self)
+            idx = self.item.contributors.index(self)
             old_citename = self._citename
             old_name = self._name
             self._citename = value
