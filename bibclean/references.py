@@ -153,6 +153,14 @@ class Person:
         else:
             raise Exception('Invalid name')
 
+    def merge_into(self, person):
+        cons = self.contributions.copy()
+        try:
+            for con in cons:
+                cons.person = person
+        except:
+            raise
+
     def compare(self, person):
         return name_comp(self.name, person.name)
 
