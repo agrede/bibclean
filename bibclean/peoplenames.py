@@ -88,7 +88,7 @@ def name_comp(a, b):
         bp = tmp
         tmp = aap
         aap = bap
-        bap = aap
+        bap = tmp
     # Build arrays needed for scoring first names
     # Arrays for a
     afns = part_comp(ap[1], 0)    # Full Uni first name parts
