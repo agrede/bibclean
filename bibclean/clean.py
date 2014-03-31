@@ -111,8 +111,10 @@ def last_name_complex_compare(people, person, min_value, comp_offset=None):
     scores = [
         (
             p,
-            person.complex_compare(p, min_value, comp_offset)/person_score
+            person.complex_compare(p, min_value, comp_offset),
+            person_score
         )
         for p in people[person.name[0]].values()
+        if p is not person
     ]
     return sorted(scores, key=lambda x: x[1], reverse=True)
