@@ -197,9 +197,11 @@ class Person:
             cond_cocons.append(cur_cocon)
         return cond_cocons
 
-    def complex_compare(self, person, min_score):
+    def complex_compare(self, person, min_score, comp_offset=None):
+        if comp_offset is None:
+            comp_offset = min_score
         simp = self.compare(person)
-        if simp == 0:
+        if simp < min_score:
             return 0
         a = [(x[0], x[1], 'a')
              for x in self.condensed_cocontributors(min_score)]
@@ -212,8 +214,8 @@ class Person:
         a = comp_list[0]
         for b in comp_list[1:]:
             cmpscore = a[0].compare(b[0])
-            if a[2] is not b[2] and cmpscore >= min_score:
-                cur_score += cmpscore*(a[1]+b[1])
+            if a[2] is not b[2] and cmpscore > min_score:
+                cur_score += (cmpscore-comp_offset)*(a[1]+b[1])
             a = b
         return simp*cur_score
 
