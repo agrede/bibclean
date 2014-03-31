@@ -88,3 +88,31 @@ def fix_dates(items, datestrs=None):
             item.date = item.formatted_date()
         else:
             item.date = datestrs[idx]
+
+
+def last_name_change_scores(people):
+    lncs = {}
+    for ln, fns in people.items():
+        lncs[ln] = 0
+        comp = max(fns.items(), key=lambda x: len(x[1].contributions))[1]
+        for fn, p in fns.items():
+            if p is not comp:
+                lncs[ln] += (comp.compare(p)-2)*len(p.contributions)
+        lncs[ln] *= len(comp.contributions)
+    return sorted(lncs.items(), key=lambda x: x[1], reverse=True)
+
+
+def last_name_item_counts(people, last_name):
+    return [(p, len(p.contributions)) for p in people[last_name].values()]
+
+
+def last_name_complex_compare(people, person, min_value, comp_offset=None):
+    person_score = person.complex_compare(person, min_value, comp_offset)
+    scores = [
+        (
+            p,
+            person.complex_compare(p, min_value, comp_offset)/person_score
+        )
+        for p in people[person.name[0]].values()
+    ]
+    return sorted(scores, key=lambda x: x[1], reverse=True)
