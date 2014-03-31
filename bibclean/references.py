@@ -157,7 +157,7 @@ class Person:
         cons = self.contributions.copy()
         try:
             for con in cons:
-                cons.person = person
+                con.person = person
         except:
             raise
 
