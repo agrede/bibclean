@@ -69,7 +69,8 @@ def remove_ezproxy(items, proxy):
 
 def dates_to_fix(items):
     return [item for item in items
-            if item.date is not None or item.date is not item.formatted_date()]
+            if item.date is not None and
+            item.date != '' and item.date != item.formatted_date()]
 
 
 def fix_dates(items, datestrs=None):
